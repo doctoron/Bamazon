@@ -10,6 +10,7 @@ const connection = mysql.createConnection({
 });
 connection.connect((err) => {
     if (err) throw err;
+    
 connection.query("SELECT product_name, price, stock_quantity FROM products WHERE item_id = 7", function (err, result, fields) {
     // connection.query("SELECT * FROM products", function (err, result, fields) {
         if (err) throw err;
