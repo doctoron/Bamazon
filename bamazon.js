@@ -14,9 +14,9 @@ let quit = () => {
 };
 
 let welcome = () => {
-  console.log("\n=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
-  console.log("Welcome to Bamazon, your NUMBER ONE source for imaginary items at the dearest prices!\nWe can't be beat....nobodys price is higher! ");
-  console.log("\n=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
+  console.log("\n=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n");
+  console.log("Welcome to Bamazon, your NUMBER ONE source for imaginary items at the dearest prices!\nWe won't be beat... nobodys price is higher!");
+  console.log("\n=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n");
 
   inquirer
     .prompt([

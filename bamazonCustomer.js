@@ -124,129 +124,71 @@ let order = () => {
         });
     });
 };
-         
 
-// console.log("Connected as id: " + connection.threadId);
-// start();
+nestedinquirer = (answer, data) => {
+    let data1 = data;
+    let index = [];
+    for (i = 0; i < answer.length; i++) {
+        index.push(answer[i].split(" ")[0]);
+    }
+    i = 0;
+    inquiry(index, data1);
+    inquiry = (index, data) => {
+        if (i < index.length) {
+            let ind = index[i] - 1;
+            let name = data[ind].product_name;
+            let stock = data[ind].stock_quantity;
+            let dept = data[ind].department_name;
+            let cost = data[ind].cost;
+            let price = data[ind].price;
+            inquirer.prompt([
+                {
+                    type: "input",
+                    message: "\nHow many " + name + " do you want to purchase?",
+                    name: "quantity",
+                    validate: (value) => {
+                        if (!isNaN(value) && value <= stock) {
+                            return true;
+                        }
+                        return false;
+                    }
+                }
+            ]).then(function (res) {
+                connection.query("UPDATE products SET stock_quantity WHERE product_name = ?", [stock - res.quantity, name], function (err, results) {
+                    if (err) throw err;
+                });
+                updatedept(dept, cost, price, res.quantity);
+                i++;
+                inquiry(index, data1);
+            });
+        }
+        else {
+            console.log("\n=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
+            console.log("Thank you for your order.  Come again soon.");
+            console.log("\n=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
+            customer();
+        };
+    };
 
-// let start = function () {
-//     inquirer.prompt({
-//         name: "choice",
-//         type: "rawlist",
-//         message:
-//             "\n What would you like to purchase?"
-//         choices: function () {
-//             let productArray = [];
-//             for (let i = 0; i < results.length; i++) {
-//                 let product_info = "";
-//                 product_info = `item: ${results[i].product_name} cost: ${results[i].price}`;
-//                 productArray.push(product_info);
-//             }
-//             return productArray;
-//         },
-//     },
-//             .then(function (inquirerResponse) {
-//         if (inquirerAnswer.confirm) {
-//             console.log(inquirerResponse)
-//             buyItem(inquirerResponse);
-//         }
-//         else {
-//             console.log("Come back again soon.");
-//         }
-//     })
-// }
+};
 
+updateDept = (dept, cost, price, quant) => {
+    connection.query("SELECT * FROM departments WHERE department_name = ?", [dept],
+        function (err, res) {
+            let result = res;
+            let newCost = parseFloat(result[0].product_cost) + parseFloat(cost) * parseInt(quant);
+            let newSales = parseFloat(result[0].product_sales) + parseFloat(price) * parseInt(quant);
+            let newProfit = parseFloat(result[0].total_profit) + (parseFloat(price) - parseFloat(cost)) * parseInt(quant);
 
-//         // function to handle purchase of new items
-//         function buyItem(inquirerResponse) {
-//             console.log('in buyItem');
-//             console.log(inquirerResponse);
-//             // prompt for info about the item being sold
-//             connection.query("SELECT * FROM products WHERE ?", { department_name: inquirerResponse.department }, function (err, results) {
-//                 if (err) throw err;
-//                 //console.log(results);
-//                 // once you have the items, prompt the user for which they'd like to bid on
-
-//                 inquirer
-//                     .prompt([
-//                         {
-//                             name: "choice",
-//                             type: "rawlist",
-//                             choices: function () {
-//                                 let choiceArray = [];
-//                                 for (let i = 0; i < results.length; i++) {
-//                                     let produt_infor = "";
-//                                     product_info = results[i].product_name + ", " + results[i].department_name + ", " + " for " + results[i].price;
-//                                     choiceArray.push(product_info);
-//                                 }
-//                                 return choiceArray;
-//                             },
-//                             message: "What item would you like to purchase?"
-//                         },
-//                         {
-//                             name: "qty",
-//                             type: "input",
-//                             message: "How many would you like to purchase?"
-//                         },
-//                         // Here we ask the user to confirm.
-//                         {
-//                             type: "confirm",
-//                             message: "Please confirm your purchase.",
-//                             name: "confirm",
-//                             default: true
-//                         }
-//                     ])
-//                     .then(function (inquirerResponse) {
-//                         // If the inquirerResponse confirms, we displays the inquirerResponse's username and pokemon from the answers.
-//                         if (inquirerResponse.confirm) {
-//                             var chosenItem;
-//                             console.log(results.length);
-//                             console.log(inquirerResponse.choice);
-//                             str = inquirerResponse.choice;
-//                             console.log(str);
-//                             var userChoice = str.split(", ")
-//                             //var userChoice = str[0] - 1;
-//                             console.log(userChoice)
-//                             userChoice = userChoice[0];
-//                             console.log('after parsing')
-//                             console.log(userChoice)
-//                             for (var i = 0; i < results.length; i++) {
-//                                 if (results[i].product_name == userChoice) {
-//                                     chosenItem = results[i];
-//                                     console.log(chosenItem);
-//                                 }
-//                             }
-//                             console.log(inquirerResponse)
-//                             console.log(chosenItem)
-//                             console.log(chosenItem.item_id)
-//                             connection.query(
-//                                 "SELECT * FROM products WHERE ?", { item_id: chosenItem.item_id },
-//                                 function (err, results) {
-//                                     if (err) throw err;
-//                                     console.log("Bid placed successfully!");
-//                                     console.log(inquirerResponse)
-//                                     console.log(results[0])
-//                                     //
-//                                     qty = parseInt(inquirerResponse.qty)
-//                                     if (results[0].stock_quanity > qty) {
-//                                         var totalPurchase = (qty * chosenItem.price);
-//                                         var msg = `Your purchase of ${inquirerResponse.qty} ${chosenItem.product_name} ${chosenItem.department_name} comes to ${totalPurchase}`
-//                                         console.log(msg)
-//                                     }
-//                                     else {
-//                                         msg = `Sorry we only ${results[0].stock_quanity} in stock for ${chosenItem.product_name} ${chosenItem.department_name}`
-//                                         console.log(msg);
-//                                     }
-
-//                                 })
-//                         }
-//                         else {
-//                             console.log("\nThat's okay, let me know when you are ready to purchase an item.\n");
-//                         }
-//                         connection.end();
-//                     })
-//             })
-//         }
-//     }
-//     )
-// }
+            connection.query("UPDATE departments SET product_costs = ? WHERE department_name = ?", [newCost, dept], function (err, resp) {
+                if (err) throw err;
+            });
+            connection.query("UPDATE departments SET product_sales = ? WHERE department_name = ?", [newSales, dept], function (err, resp) {
+                if (err) throw err;
+            });
+            connection.query("UPDATE departments SET total_profits = ? WHERE department_name = ?", [newProfit, dept], function (err, resp) {
+                if (err) throw err;
+            });
+        });
+};
+module.exports = customer;
