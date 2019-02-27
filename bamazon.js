@@ -1,9 +1,17 @@
 const mysql = require('mysql');
 const inquirer = require("inquirer");
+require('dotenv').config();
+const connection = mysql.createConnection({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: 'bamazon'
+});
+
 
 let customer = require("./bamazonCustomer.js");
-let manager = require("./bamazonManager");
-let supervisor = require("./bamazonSupervisor");
+let manager = require("./bamazonManager.js");
+let supervisor = require("./bamazonSupervisor.js");
 let options = ["Customer", "Manager", "Supervisor", "Exit"];
 
 let quit = () => {

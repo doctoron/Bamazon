@@ -6,9 +6,9 @@ let options = ["Search", "Order", "Return to Main Menu"];
 
 const connection = mysql.createConnection({
     host: 'localhost',
-    port: 3306,
     user: 'root',
     password: 'FzvnXsF0iL53TX6L',
+    // password: Process.env.DB_PASSWORD,
     database: 'bamazon'
 });
 
