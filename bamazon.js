@@ -3,6 +3,7 @@ const inquirer = require("inquirer");
 require('dotenv').config();
 const connection = mysql.createConnection({
     host: process.env.DB_HOST,
+    port: 3306,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: 'bamazon'
@@ -23,7 +24,7 @@ let quit = () => {
 
 let welcome = () => {
   console.log("\n=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n");
-  console.log("Welcome to Bamazon, your NUMBER ONE source for imaginary items at the dearest prices!\nWe won't be beat... nobodys price is higher!");
+  console.log("Welcome to Bamazon, your NUMBER ONE source for imaginary items at the dearest prices!\nAny sufficiently advanced technology is indistinguishable from magic.~ Arthur C. Clarke");
   console.log("\n=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n");
 
   inquirer
