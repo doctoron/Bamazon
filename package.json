@@ -22,7 +22,9 @@
   "dependencies": {
     "dotenv": "^6.2.0",
     "easy-table": "^1.1.1",
+    "eslint": "^5.15.3",
     "inquirer": "^6.2.2",
-    "mysql": "github:mysqljs/mysql"
+    "mysql": "github:mysqljs/mysql",
+    "mysql2": "^1.6.5"
   }
 }

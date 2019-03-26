@@ -1,9 +1,10 @@
-require('dotenv').config();
+// Get required dependencies
+const dotenv = require('dotenv').config();
 const inquirer = require("inquirer");
 const mysql = require('mysql');
 const Table = require("easy-table");
-let username = "test";
-let password = "justatest";
+// let username = "DB_USER";
+// let password = "DB_PASSWORD";
 
 let options = ["View Low Inventory", "View All Inventory", "Update Inventory", "Add New Product", "Return to Main Menu"];
 const connection = mysql.createConnection({
@@ -12,201 +13,274 @@ const connection = mysql.createConnection({
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: 'bamazon'
-});
-
+})
 connection.connect((err) => {
     if (err) throw err;
 });
 
-let login = () => {
-    console.log("\n=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n");
-    console.log("Please submit your Username and Password");
-    inquirer.prompt([
-        {
-            type: "confirm",
-            message: "Ready? \n",
-            name: "islogin"
-        }
-    ]).then(function (res) {
-        if (res.islogin) {
-            inquirer.prompt([
-                {
-                    type: "input",
-                    message: "Username:",
-                    name: "username"
-                },
-                {
-                    type: "password",
-                    message: "Password:",
-                    name: "password"
-                }
-            ]).then(function (res) {
-                if (res.username === username && res.password === password) {
-                    console.log("\n=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n");
-                    console.log("Welcome 'Test' to Manager Access.");
-                    console.log("\n=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n");
-                    manager();
-                }
-                else {
-                    console.log("\n=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n");
-                    console.log("Invalid Username or password.");
-                    console.log("\n=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n");
-                    login();
-                }
-            });
-        }
-        else {
-            let welcome = require("./bamazon.js");
-            welcome();
-        };
-    });
-}
+// // promptManagerAction will present menu options to the manager and trigger appropriate logic
+// function promptManagerAction() {
+// 	// console.log('___ENTER promptManagerAction___');
 
-let manager = () => {
-    inquirer.prompt([
-        {
-            type: "list",
-            choices: options,
-            name: "options",
-            message: "Please pick a task?"
-        }
-    ]).then(function (res) {
-        switch (res.options) {
-            case options[0]:
-                viewAll();
-                break;
-            case options[1]:
-                viewLow();
-                break;
-            case options[2]:
-                updateInv();
-                break;
-            case options[3]:
-                addNew();
-                break;
-            default:
-                let welcome = require("./bamazon.js");
-                welcome();
-                break;
-        }
-    });
-};
+// 	// Prompt the manager to select an option
+// 	inquirer.prompt([
+// 		{
+// 			type: 'list',
+// 			name: 'option',
+// 			message: 'Please select an option:',
+// 			choices: ['View Products for Sale', 'View Low Inventory', 'Add to Inventory', 'Add New Product'],
+// 			filter: function (val) {
+// 				if (val === 'View Products for Sale') {
+// 					return 'sale';
+// 				} else if (val === 'View Low Inventory') {
+// 					return 'lowInventory';
+// 				} else if (val === 'Add to Inventory') {
+// 					return 'addInventory';
+// 				} else if (val === 'Add New Product') {
+// 					return 'newProduct';
+// 				} else {
+// 					// This case should be unreachable
+// 					console.log('ERROR: Unsupported operation!');
+// 					exit(1);
+// 				}
+// 			}
+// 		}
+// 	]).then(function(input) {
+// 		// console.log('User has selected: ' + JSON.stringify(input));
 
-let viewLow = () => {
-    inquirer.prompt([
-        {
-            type: "list",
-            message: "\nSort by: ",
-            choices: ["Department", "Price (Ascending)", "Price (Descending)"],
-            name: "options"
-        }
-    ]).then(function (res) {
-        switch (res.options) {
-            case "Price (Ascending)":
-                connection.query("SELECT * FROM products ORDER BY price",
-                    function (err, results) {
-                        if (err) throw err;
-                        console.log("/n" + Table.print(results, {
-                            item_id: { name: "Product ID" },
-                            product_name: { name: "Product Name" },
-                            department_name: { name: "Department" },
-                            price: {
-                                name: "Price ($)",
-                                printer: Table.number(2)
-                            },
-                            stock_quantity: { name: "Stock Quantity" },
-                            cost: { name: "Unit Cost" }
-                        })
-                        );
-                        manager();
-                    });
-                break;
-            case "Price (Descending)":
-                connection.query("SELECT * FROM products ORDER BY price DESC",
-                    function (err, results) {
-                        if (err) throw err;
-                        console.log("/n" + Table.print(results, {
-                            item_id: { name: "Product ID" },
-                            product_name: { name: "Product Name" },
-                            department_name: { name: "Department" },
-                            price: {
-                                name: "Price ($)",
-                                printer: Table.number(2)
-                            },
-                            stock_quantity: { name: "Stock Quantity" },
-                            cost: { name: "Unit Cost" }
-                        })
-                        );
-                        manager();
-                    });
-                break;
-            case "Department":
-                connection.query("SELECT * FROM products ORDER BY department",
-                    function (err, results) {
-                        if (err) throw err;
-                        console.log("/n" + Table.print(results, {
-                            item_id: { name: "Product ID" },
-                            product_name: { name: "Product Name" },
-                            department_name: { name: "Department" },
-                            price: {
-                                name: "Price ($)",
-                                printer: Table.number(2)
-                            },
-                            stock_quantity: { name: "Stock Quantity" },
-                            cost: { name: "Unit Cost" }
-                        })
-                        );
-                        manager();
-                    });
-                break;
-        }
-    });
-}
-let viewLow = () => {
-    console.log("\n=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--\n");
-    console.log("Low inventory criteria:\n \n1. Magic Wand, Light Saber, Immortality Elixer: less than 5; \n2. Musical Instruments: less than 10; \n3. Electronics and Telescopes: less than 12.");
-    console.log("\n=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--\n");
-    console.log("Department: Imagination Department\n")
-    connection.query("SELECT * FROM products WHERE department_name = \"Imagination Department\" AND stock_quantity < 5", function (err, res) {
-        if (err) throw err;
-        if (res.lengths === 0) {
-            console.log("All items are in sufficient quantity at this time.");
-        }
-        else {
-            console.log(
-                Table.print(res, {
-                    item_id: { name: "Product ID" },
-                    product_name: {
-                        name: "Product Name",
-                        department_name: { name: "Department Name" },
-                        price: { name: "Price ($)", printer: Table.number(2) },
-                        cost: { name: "Cost" }
-                    }
-                })
-            );
-        }
-        console.log("\n=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--\n");
-        console.log("Low inventory criteria:\n \n1. Magic Wand, Light Saber, Immortality Elixer: less than 5; \n2. Musical Instruments: less than 10; \n3. Electronics and Telescopes: less than 12.");
-        console.log("\n=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--\n");
-        console.log("Department: Imagination Department\n")
-        connection.query("SELECT * FROM products WHERE department_name = \"Imagination Department\" AND stock_quantity < 5", function (err, res1) {
-            if (err) throw err;
-            if (res1.length === 0) {
-                console.log("All items are in sufficient quantity at this time.");
-            }
-            else {
-                console.log(
-                    Table.print(res1, {
-                        item_id: { name: "Product ID" },
-                        product_name: {
-                            name: "Product Name",
-                            department_name: { name: "Department Name" },
-                            price: { name: "Price ($)", printer: Table.number(2) },
-                            cost: { name: "Cost" }
-                        }
-                    })
-                );
-            }
-        }
-        
-module.exports = login;
+// 		// Trigger the appropriate action based on the user input
+// 		if (input.option ==='sale') {
+// 			displayInventory();
+// 		} else if (input.option === 'lowInventory') {
+// 			displayLowInventory();
+// 		} else if (input.option === 'addInventory') {
+// 			addInventory();
+// 		} else if (input.option === 'newProduct') {
+// 			createNewProduct();
+// 		} else {
+// 			// This case should be unreachable
+// 			console.log('ERROR: Unsupported operation!');
+// 			exit(1);
+// 		}
+// 	})
+// }
+
+// // displayInventory will retrieve the current inventory from the database and output it to the console
+// function displayInventory() {
+// 	// console.log('___ENTER displayInventory___');
+
+// 	// Construct the db query string
+// 	queryStr = 'SELECT * FROM products';
+
+// 	// Make the db query
+// 	connection.query(queryStr, function(err, data) {
+// 		if (err) throw err;
+
+// 		console.log('Existing Inventory: ');
+// 		console.log('...................\n');
+
+// 		var strOut = '';
+// 		for (var i = 0; i < data.length; i++) {
+// 			strOut = '';
+// 			strOut += 'Item ID: ' + data[i].item_id + '  //  ';
+// 			strOut += 'Product Name: ' + data[i].product_name + '  //  ';
+// 			strOut += 'Department: ' + data[i].department_name + '  //  ';
+// 			strOut += 'Price: $' + data[i].price + '  //  ';
+// 			strOut += 'Quantity: ' + data[i].stock_quantity + '\n';
+
+// 			console.log(strOut);
+// 		}
+
+// 	  	console.log("---------------------------------------------------------------------\n");
+
+// 		// End the database connection
+// 		connection.end();
+// 	})
+// }
+
+// // displayLowInventory will display a list of products with the available quantity below 100
+// function displayLowInventory() {
+// 	// console.log('___ENTER displayLowInventory');
+
+// 	// Construct the db query string
+// 	queryStr = 'SELECT * FROM products WHERE stock_quantity < 100';
+
+// 	// Make the db query
+// 	connection.query(queryStr, function(err, data) {
+// 		if (err) throw err;
+
+// 		console.log('Low Inventory Items (below 100): ');
+// 		console.log('................................\n');
+
+// 		var strOut = '';
+// 		for (var i = 0; i < data.length; i++) {
+// 			strOut = '';
+// 			strOut += 'Item ID: ' + data[i].item_id + '  //  ';
+// 			strOut += 'Product Name: ' + data[i].product_name + '  //  ';
+// 			strOut += 'Department: ' + data[i].department_name + '  //  ';
+// 			strOut += 'Price: $' + data[i].price + '  //  ';
+// 			strOut += 'Quantity: ' + data[i].stock_quantity + '\n';
+
+// 			console.log(strOut);
+// 		}
+
+// 	  	console.log("---------------------------------------------------------------------\n");
+
+// 		// End the database connection
+// 		connection.end();
+// 	})
+// }
+
+// // validateInteger makes sure that the user is supplying only positive integers for their inputs
+// function validateInteger(value) {
+// 	var integer = Number.isInteger(parseFloat(value));
+// 	var sign = Math.sign(value);
+
+// 	if (integer && (sign === 1)) {
+// 		return true;
+// 	} else {
+// 		return 'Please enter a whole non-zero number.';
+// 	}
+// }
+
+// // validateNumeric makes sure that the user is supplying only positive numbers for their inputs
+// function validateNumeric(value) {
+// 	// Value must be a positive number
+// 	var number = (typeof parseFloat(value)) === 'number';
+// 	var positive = parseFloat(value) > 0;
+
+// 	if (number && positive) {
+// 		return true;
+// 	} else {
+// 		return 'Please enter a positive number for the unit price.'
+// 	}
+// }
+
+// // addInventory will guilde a user in adding additional quantify to an existing item
+// function addInventory() {
+// 	// console.log('___ENTER addInventory___');
+
+// 	// Prompt the user to select an item
+// 	inquirer.prompt([
+// 		{
+// 			type: 'input',
+// 			name: 'item_id',
+// 			message: 'Please enter the Item ID for stock_count update.',
+// 			validate: validateInteger,
+// 			filter: Number
+// 		},
+// 		{
+// 			type: 'input',
+// 			name: 'quantity',
+// 			message: 'How many would you like to add?',
+// 			validate: validateInteger,
+// 			filter: Number
+// 		}
+// 	]).then(function(input) {
+// 		// console.log('Manager has selected: \n    item_id = '  + input.item_id + '\n    additional quantity = ' + input.quantity);
+
+// 		var item = input.item_id;
+// 		var addQuantity = input.quantity;
+
+// 		// Query db to confirm that the given item ID exists and to determine the current stock_count
+// 		var queryStr = 'SELECT * FROM products WHERE ?';
+
+// 		connection.query(queryStr, {item_id: item}, function(err, data) {
+// 			if (err) throw err;
+
+// 			// If the user has selected an invalid item ID, data attay will be empty
+// 			// console.log('data = ' + JSON.stringify(data));
+
+// 			if (data.length === 0) {
+// 				console.log('ERROR: Invalid Item ID. Please select a valid Item ID.');
+// 				addInventory();
+
+// 			} else {
+// 				var productData = data[0];
+
+// 				// console.log('productData = ' + JSON.stringify(productData));
+// 				// console.log('productData.stock_quantity = ' + productData.stock_quantity);
+
+// 				console.log('Updating Inventory...');
+
+// 				// Construct the updating query string
+// 				var updateQueryStr = 'UPDATE products SET stock_quantity = ' + (productData.stock_quantity + addQuantity) + ' WHERE item_id = ' + item;
+// 				// console.log('updateQueryStr = ' + updateQueryStr);
+
+// 				// Update the inventory
+// 				connection.query(updateQueryStr, function(err, data) {
+// 					if (err) throw err;
+
+// 					console.log('Stock count for Item ID ' + item + ' has been updated to ' + (productData.stock_quantity + addQuantity) + '.');
+// 					console.log("\n---------------------------------------------------------------------\n");
+
+// 					// End the database connection
+// 					connection.end();
+// 				})
+// 			}
+// 		})
+// 	})
+// }
+
+// // createNewProduct will guide the user in adding a new product to the inventory
+// function createNewProduct() {
+// 	// console.log('___ENTER createNewProduct___');
+
+// 	// Prompt the user to enter information about the new product
+// 	inquirer.prompt([
+// 		{
+// 			type: 'input',
+// 			name: 'product_name',
+// 			message: 'Please enter the new product name.',
+// 		},
+// 		{
+// 			type: 'input',
+// 			name: 'department_name',
+// 			message: 'Which department does the new product belong to?',
+// 		},
+// 		{
+// 			type: 'input',
+// 			name: 'price',
+// 			message: 'What is the price per unit?',
+// 			validate: validateNumeric
+// 		},
+// 		{
+// 			type: 'input',
+// 			name: 'stock_quantity',
+// 			message: 'How many items are in stock?',
+// 			validate: validateInteger
+// 		}
+// 	]).then(function(input) {
+// 		// console.log('input: ' + JSON.stringify(input));
+
+// 		console.log('Adding New Item: \n    product_name = ' + input.product_name + '\n' +  
+// 									   '    department_name = ' + input.department_name + '\n' +  
+// 									   '    price = ' + input.price + '\n' +  
+// 									   '    stock_quantity = ' + input.stock_quantity);
+
+// 		// Create the insertion query string
+// 		var queryStr = 'INSERT INTO products SET ?';
+
+// 		// Add new product to the db
+// 		connection.query(queryStr, input, function (error, results, fields) {
+// 			if (error) throw error;
+
+// 			console.log('New product has been added to the inventory under Item ID ' + results.insertId + '.');
+// 			console.log("\n---------------------------------------------------------------------\n");
+
+// 			// End the database connection
+// 			connection.end();
+// 		});
+// 	})
+// }
+
+// // runBamazon will execute the main application logic
+// function runBamazon() {
+// 	// console.log('___ENTER runBamazon___');
+
+// 	// Prompt manager for input
+// 	promptManagerAction();
+// }
+
+// // Run the application logic
+// runBamazon();

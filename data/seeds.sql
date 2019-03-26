@@ -27,7 +27,6 @@ VALUES ("JBL Waterproof Bluetooth Speaker (Black)", "Electronics", 99.00, 16),
 
 
 SELECT product_name, price, stock_quantity FROM products WHERE item_id = 7;
-SELECT product_name, price, stock_quantity FROM products WHERE item_id = $("itemId");
  
 
 
