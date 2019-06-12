@@ -20,11 +20,11 @@
   },
   "homepage": "https://github.com/doctoron/Bamazon#readme",
   "dependencies": {
-    "dotenv": "^6.2.0",
+    "dotenv": "^8.0.0",
     "easy-table": "^1.1.1",
-    "eslint": "^5.15.3",
-    "inquirer": "^6.2.2",
-    "mysql": "github:mysqljs/mysql",
+    "eslint": "^5.16.0",
+    "inquirer": "^6.3.1",
+    "mysql": "^2.17.1",
     "mysql2": "^1.6.5"
   }
 }
